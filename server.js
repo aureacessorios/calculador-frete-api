@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = ['https://seudominio.myshopify.com']; // substitua pelo domínio real da sua loja
+const allowedOrigins = ['https://saude-alta-brasil.myshopify.com']; // substitua pelo domínio real da sua loja
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
