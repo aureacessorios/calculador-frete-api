@@ -11,6 +11,35 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post('/frete', async (req, res) => {
+
+app = Flask(__name__)
+
+@app.route('/frete', methods=['POST'])
+def calcular_frete():
+    data = request.get_json()
+
+    # Extraia os dados
+    cep_origem = data.get('cep_origem')
+    cep_destino = data.get('cep_destino')
+    peso = data.get('peso')
+    comprimento = data.get('comprimento')
+    altura = data.get('altura')
+    largura = data.get('largura')
+
+    # Aqui você pode chamar o cálculo de frete real
+    resultado = {
+        "cep_origem": cep_origem,
+        "cep_destino": cep_destino,
+        "frete": 19.90  # valor fictício
+    }
+
+    return jsonify(resultado)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+  
   const { to, product } = req.body;
 
   const token = process.env.MELHOR_ENVIO_TOKEN;
