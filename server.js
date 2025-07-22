@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = ['https://www.aureacessorios.com.br']; // substitua pelo domínio real da sua loja
+const allowedOrigins = ['https://www.aureacessorios.com.br'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -46,7 +46,7 @@ app.post('/frete', async (req, res) => {
       receipt: false,
       insurance_value: product.price,
     },
-    services: [], // Vazio = buscar todos disponíveis
+    services: [], // Vazio para trazer todas
   };
 
   try {
@@ -57,25 +57,24 @@ app.post('/frete', async (req, res) => {
       },
     });
 
-    let fretesFiltrados = response.data.filter((item) => {
-      const nome = item.name.toLowerCase();
-      return (
-        nome.includes('loggi') ||
-        nome.includes('jadlog') ||
-        nome.includes('correios')
-      );
+    // Lista de transportadoras desejadas (por nome)
+    const transportadorasDesejadas = ['Correios', 'Jadlog', 'Loggi'];
+
+    // Filtrando apenas as desejadas
+    let fretesFiltrados = response.data.filter(frete => {
+      return transportadorasDesejadas.some(nome => frete.name.toLowerCase().includes(nome.toLowerCase()));
     });
 
-    // Adiciona frete grátis se o valor total dos produtos for >= 149.90
-    if (product.price * product.quantity >= 149.90) {
-      fretesFiltrados.unshift({
-        name: 'Frete Grátis',
+    // Adicionando FRETE GRÁTIS como informativo se preço total >= 149.90
+    if (product.price >= 149.90) {
+      fretesFiltrados.push({
+        name: 'FRETE GRÁTIS',
         price: 0,
         delivery_time: {
-          days: 5,
-          working_days: true,
+          days: 0,
+          working_days: true
         },
-        custom: true, // Marcador opcional para saber que foi adicionado manualmente
+        custom: true // marcador para ser tratado diferente no front
       });
     }
 
