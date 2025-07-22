@@ -46,7 +46,7 @@ app.post('/frete', async (req, res) => {
       receipt: false,
       insurance_value: product.price,
     },
-    services: [],
+    services: [], // Vazio = buscar todos disponíveis
   };
 
   try {
@@ -57,7 +57,29 @@ app.post('/frete', async (req, res) => {
       },
     });
 
-    res.json(response.data);
+    let fretesFiltrados = response.data.filter((item) => {
+      const nome = item.name.toLowerCase();
+      return (
+        nome.includes('loggi') ||
+        nome.includes('jadlog') ||
+        nome.includes('correios')
+      );
+    });
+
+    // Adiciona frete grátis se o valor total dos produtos for >= 149.90
+    if (product.price * product.quantity >= 149.90) {
+      fretesFiltrados.unshift({
+        name: 'Frete Grátis',
+        price: 0,
+        delivery_time: {
+          days: 5,
+          working_days: true,
+        },
+        custom: true, // Marcador opcional para saber que foi adicionado manualmente
+      });
+    }
+
+    res.json(fretesFiltrados);
   } catch (error) {
     const errorMessage = error.response?.data || error.message;
     console.error('Erro ao calcular frete:', errorMessage);
